@@ -13,7 +13,7 @@ use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\View\Result\Layout;
 use Magento\Framework\View\Result\LayoutFactory;
-use Magento\Quote\Api\CartRepositoryInterface;
+use Zero\RewardPoints\Model\CartPoints;
 
 /**
  * "Use my points" / "Don't use" in the checkout's order summary (HTMX POST;
@@ -26,8 +26,8 @@ class Apply implements HttpPostActionInterface
     public function __construct(
         private readonly LayoutFactory $resultLayoutFactory,
         private readonly CheckoutSession $checkoutSession,
-        private readonly CartRepositoryInterface $cartRepository,
-        private readonly RequestInterface $request
+        private readonly RequestInterface $request,
+        private readonly CartPoints $cartPoints
     ) {
     }
 
@@ -38,10 +38,7 @@ class Apply implements HttpPostActionInterface
     {
         $quote = $this->checkoutSession->getQuote();
         if ($quote->getId() && $quote->getCustomerId()) {
-            // All the balance: the totals take what the order allows.
-            $quote->setData('zero_reward_points', $this->request->getParam('use') === '1' ? PHP_INT_MAX >> 32 : 0);
-            $quote->setTotalsCollectedFlag(false)->collectTotals();
-            $this->cartRepository->save($quote);
+            $this->cartPoints->apply($quote, $this->request->getParam('use') === '1');
         }
         $resultLayout = $this->resultLayoutFactory->create();
         $resultLayout->addDefaultHandle();
