@@ -63,6 +63,8 @@ Stores > Configuration where it has a setting, or back up first:
 dropped (`--data-restore=1` puts it back). Deleting the module's code instead
 leaves the tables in place.
 
+What changed in each release: [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
 OSL-3.0 or AFL-3.0, your choice: see `NOTICE.md`.
